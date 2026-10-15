@@ -1,130 +1,69 @@
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async () => {
-  try {
-    const mangaDexUrl = new URL("https://api.mangadex.org/manga");
-    mangaDexUrl.searchParams.set("limit", "16");
-    mangaDexUrl.searchParams.append("includes[]", "cover_art");
-    mangaDexUrl.searchParams.set("order[followedCount]", "desc");
-    mangaDexUrl.searchParams.append("contentRating[]", "safe");
-    mangaDexUrl.searchParams.append("contentRating[]", "suggestive");
-
-    const res = await fetch(mangaDexUrl.toString(), {
-      headers: {
-        "User-Agent": "MangaTrack/1.0",
-        "Accept": "application/json",
-      },
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      const list = (data.data || []).map((item: any) => {
-        const titles = item.attributes?.title || {};
-        const title =
-          titles.en ||
-          titles["ja-ro"] ||
-          Object.values(titles)[0] ||
-          "Untitled";
-
-        const coverRel = item.relationships?.find(
-          (rel: any) => rel.type === "cover_art"
-        );
-        const fileName = coverRel?.attributes?.fileName;
-        const coverUrl = fileName
-          ? `https://uploads.mangadex.org/covers/${item.id}/${fileName}.512.jpg`
-          : null;
-
-        return {
-          id: item.id,
-          title,
-          coverUrl,
-          status: item.attributes?.status || "ongoing",
-        };
-      });
-
-      if (list.length > 0) {
-        return new Response(JSON.stringify({ data: list }), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "public, max-age=3600, s-maxage=86400",
-          },
-        });
-      }
-    }
-  } catch {
-    // Network / cert fallback
-  }
-
-  // Fallback data populer teruji dari MangaDex agar marquee selalu tampil sempurna
-  const fallbackPopular = [
+  // Daftar manga populer terverifikasi di MangaDex dengan cover asli berkualitas tinggi
+  const verifiedPopular = [
     {
-      id: "b40280b2-ff6b-4573-bfba-79e51c8dbd98",
+      id: "b0b721ff-c388-4486-aa0f-c2b0bb321512",
       title: "Sousou no Frieren",
-      coverUrl: "https://uploads.mangadex.org/covers/b40280b2-ff6b-4573-bfba-79e51c8dbd98/6168be41-1188-4228-8547-3be9cf8fa722.jpg.512.jpg",
+      coverUrl: "https://uploads.mangadex.org/covers/b0b721ff-c388-4486-aa0f-c2b0bb321512/75a1cb6f-0554-4447-bf6e-0ef759af3f48.jpg.512.jpg",
       status: "ongoing",
     },
     {
       id: "a1c7c817-4e59-43b7-9365-09675a149a6f",
       title: "One Piece",
-      coverUrl: "https://uploads.mangadex.org/covers/a1c7c817-4e59-43b7-9365-09675a149a6f/761e389b-f116-43b9-a2e6-764057e937d3.jpg.512.jpg",
+      coverUrl: "https://uploads.mangadex.org/covers/a1c7c817-4e59-43b7-9365-09675a149a6f/2f4aca53-64c7-46ac-ae85-3bc9b3169890.png.512.jpg",
       status: "ongoing",
     },
     {
-      id: "32d76d19-8a05-4db0-9fc2-e0b0648fe9d0",
-      title: "Solo Leveling",
-      coverUrl: "https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/342999e5-9430-4e59-9941-ad6b38cff06e.jpg.512.jpg",
-      status: "completed",
-    },
-    {
-      id: "e78a489b-6632-4d61-b069-52341f4b25a7",
+      id: "e896c48c-3150-437d-ba57-d8567eb399ae",
       title: "Chainsaw Man",
-      coverUrl: "https://uploads.mangadex.org/covers/e78a489b-6632-4d61-b069-52341f4b25a7/218cb72c-e300-482a-a9e9-d3e74ff1f7c0.jpg.512.jpg",
+      coverUrl: "https://uploads.mangadex.org/covers/e896c48c-3150-437d-ba57-d8567eb399ae/fa06e4e4-ef2a-477b-bfb6-a2a88793620b.jpg.512.jpg",
       status: "ongoing",
     },
     {
-      id: "d8f93318-ea34-471c-a4ff-a3f0254d6453",
-      title: "Jujutsu Kaisen",
-      coverUrl: "https://uploads.mangadex.org/covers/d8f93318-ea34-471c-a4ff-a3f0254d6453/3daeec7e-07f9-467f-9d32-eb803c625805.jpg.512.jpg",
-      status: "completed",
-    },
-    {
-      id: "c0ee660b-84ad-423e-ac85-91ff405ae699",
-      title: "Oshi no Ko",
-      coverUrl: "https://uploads.mangadex.org/covers/c0ee660b-84ad-423e-ac85-91ff405ae699/65d1d619-ba6b-4e6f-a8ea-68218f401ad8.jpg.512.jpg",
-      status: "completed",
-    },
-    {
-      id: "3046eb30-d3e3-4d01-9997-789a74442eb2",
-      title: "Bocchi the Rock!",
-      coverUrl: "https://uploads.mangadex.org/covers/3046eb30-d3e3-4d01-9997-789a74442eb2/05e2697b-6072-4d7a-af7f-775c754d9c49.jpg.512.jpg",
+      id: "68112dc1-2b80-4f20-beb8-2f2a8716a430",
+      title: "Dandadan",
+      coverUrl: "https://uploads.mangadex.org/covers/68112dc1-2b80-4f20-beb8-2f2a8716a430/85b5b2e9-0e3c-436f-88e1-91e3b7934b38.jpg.512.jpg",
       status: "ongoing",
     },
     {
-      id: "bc287a98-333e-4b68-80f0-82cc7867201b",
+      id: "6b958848-c885-4735-9201-12ee77abcb3c",
       title: "SPY×FAMILY",
-      coverUrl: "https://uploads.mangadex.org/covers/bc287a98-333e-4b68-80f0-82cc7867201b/099ca108-99ee-47b2-a42e-2e212404e9bc.jpg.512.jpg",
+      coverUrl: "https://uploads.mangadex.org/covers/6b958848-c885-4735-9201-12ee77abcb3c/91a35e78-62b2-41fe-9869-ce051f2d1070.jpg.512.jpg",
       status: "ongoing",
     },
     {
-      id: "801513ba-a712-4985-8c30-c82e8081396e",
-      title: "Berserk",
-      coverUrl: "https://uploads.mangadex.org/covers/801513ba-a712-4985-8c30-c82e8081396e/7b0965d1-9481-4322-8302-36c927f88ebc.jpg.512.jpg",
-      status: "ongoing",
+      id: "6a1d1cb1-ecd5-40d9-89ff-9d88e40b136b",
+      title: "Tokyo Ghoul",
+      coverUrl: "https://uploads.mangadex.org/covers/6a1d1cb1-ecd5-40d9-89ff-9d88e40b136b/040e8ae9-4ddd-49d2-8986-56782b391714.jpg.512.jpg",
+      status: "completed",
     },
     {
-      id: "ed99f2aa-ca5f-467a-9774-839f83a483a9",
-      title: "Blue Lock",
-      coverUrl: "https://uploads.mangadex.org/covers/ed99f2aa-ca5f-467a-9774-839f83a483a9/b12e3650-6a75-4fc1-a966-d4f19ad178ef.jpg.512.jpg",
+      id: "239d6260-d71f-43b0-afff-074e3619e3de",
+      title: "Bleach",
+      coverUrl: "https://uploads.mangadex.org/covers/239d6260-d71f-43b0-afff-074e3619e3de/032cc781-43eb-4281-956c-7cf991dd0a6a.jpg.512.jpg",
+      status: "completed",
+    },
+    {
+      id: "6b1eb93e-473a-4ab3-9922-1a66d2a29a4a",
+      title: "Naruto",
+      coverUrl: "https://uploads.mangadex.org/covers/6b1eb93e-473a-4ab3-9922-1a66d2a29a4a/c5a3090c-4ca0-40a2-9102-e0ee0c6dac15.jpg.512.jpg",
+      status: "completed",
+    },
+    {
+      id: "0c44cf39-3d6c-4472-815b-9e163613cfe9",
+      title: "Kimi ga Shinu made Koi o Shitai",
+      coverUrl: "https://uploads.mangadex.org/covers/0c44cf39-3d6c-4472-815b-9e163613cfe9/bda1d964-69fb-4438-a312-cf9a5fbae77a.png.256.jpg",
       status: "ongoing",
     },
   ];
 
-  return new Response(JSON.stringify({ data: fallbackPopular }), {
+  return new Response(JSON.stringify({ data: verifiedPopular }), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "public, max-age=3600, s-maxage=86400",
     },
   });
 };
