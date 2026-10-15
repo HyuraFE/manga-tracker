@@ -54,7 +54,7 @@ export const GET: APIRoute = async ({ request }) => {
       );
       const fileName = coverRel?.attributes?.fileName;
       const coverUrl = fileName
-        ? `https://uploads.mangadex.org/covers/${item.id}/${fileName}.256.jpg`
+        ? `https://uploads.mangadex.org/covers/${item.id}/${fileName}.512.jpg`
         : null;
 
       return {

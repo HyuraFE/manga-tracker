@@ -26,6 +26,14 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   dropped: { label: "Dropped", color: "bg-slate-200 text-slate-700" },
 };
 
+const getCoverUrl = (url: string | null) => {
+  if (!url) return null;
+  if (url.startsWith("https://uploads.mangadex.org/")) {
+    return `/api/manga/cover?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+};
+
 export default function LibraryManager() {
   const [items, setItems] = useState<UserMangaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -235,9 +243,10 @@ export default function LibraryManager() {
                 <div className="relative aspect-[2/3] bg-pastel-surface/30 overflow-hidden">
                   {manga.coverUrl ? (
                     <img
-                      src={manga.coverUrl}
+                      src={getCoverUrl(manga.coverUrl) || ""}
                       alt={manga.title}
                       loading="lazy"
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
                     />
                   ) : (
@@ -245,6 +254,9 @@ export default function LibraryManager() {
                       No Cover
                     </div>
                   )}
+
+                  {/* Subtle top vignette for badge clarity */}
+                  <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
 
                   {/* Status Badge floating */}
                   <div className="absolute top-2 left-2">
@@ -255,11 +267,11 @@ export default function LibraryManager() {
                     </span>
                   </div>
 
-                  {/* Delete Button floating on hover */}
+                  {/* Delete Button */}
                   <button
                     type="button"
                     onClick={() => handleDelete(manga.id, manga.title)}
-                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-50 shadow-sm cursor-pointer"
+                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 text-rose-500 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-50 shadow-sm cursor-pointer"
                     title="Hapus dari library"
                   >
                     <Trash size={14} weight="bold" />
