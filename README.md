@@ -33,7 +33,7 @@
 
 <!-- Opsional: Ganti URL gambar di bawah dengan screenshot aplikasimu -->
 <div align="center">
-  <img src="https://github.com/HyuraFE/manga-tracker/assets/library.png" alt="Preview" width="85%" style="border-radius: 8px;" />
+  <img src="https://github.com/HyuraFE/manga-tracker/blob/main/assets/library.png" alt="Preview" width="85%" style="border-radius: 8px;" />
 </div>
 
 <br />
