@@ -14,14 +14,6 @@ interface SearchModalProps {
   onMangaAdded?: () => void;
 }
 
-const getCoverUrl = (url: string | null) => {
-  if (!url) return null;
-  if (url.startsWith("https://uploads.mangadex.org/")) {
-    return `/api/manga/cover?url=${encodeURIComponent(url)}`;
-  }
-  return url;
-};
-
 export default function SearchModal({ onMangaAdded }: SearchModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -173,7 +165,7 @@ export default function SearchModal({ onMangaAdded }: SearchModalProps) {
                       <div className="w-16 h-22 rounded-lg bg-pastel-surface/50 border border-pastel-accent/30 overflow-hidden shrink-0 flex items-center justify-center">
                         {manga.coverUrl ? (
                           <img
-                            src={getCoverUrl(manga.coverUrl) || ""}
+                            src={manga.coverUrl}
                             alt={manga.title}
                             className="w-full h-full object-cover"
                             loading="lazy"

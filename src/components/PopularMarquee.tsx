@@ -8,14 +8,6 @@ interface PopularManga {
   status: string;
 }
 
-const getCoverUrl = (url: string | null) => {
-  if (!url) return null;
-  if (url.startsWith("https://uploads.mangadex.org/")) {
-    return `/api/manga/cover?url=${encodeURIComponent(url)}`;
-  }
-  return url;
-};
-
 export default function PopularMarquee() {
   const [popular, setPopular] = useState<PopularManga[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +116,7 @@ export default function PopularMarquee() {
                 {/* Poster Cover */}
                 {manga.coverUrl ? (
                   <img
-                    src={getCoverUrl(manga.coverUrl) || ""}
+                    src={manga.coverUrl}
                     alt={manga.title}
                     loading="lazy"
                     referrerPolicy="no-referrer"
