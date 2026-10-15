@@ -55,6 +55,21 @@ export default function SearchModal({ onMangaAdded }: SearchModalProps) {
     return () => clearTimeout(timer);
   }, [query]);
 
+  // Keyboard shortcut (Cmd/Ctrl + K and Esc)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsOpen((prev) => !prev);
+      }
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   const handleAdd = async (manga: MangaSearchResult) => {
     setAddingId(manga.id);
     try {
@@ -71,7 +86,6 @@ export default function SearchModal({ onMangaAdded }: SearchModalProps) {
       if (res.ok) {
         setAddedIds((prev) => ({ ...prev, [manga.id]: true }));
         if (onMangaAdded) onMangaAdded();
-        // trigger page refresh or event if needed
         window.dispatchEvent(new CustomEvent("manga-library-updated"));
       } else {
         const errData = await res.json();
@@ -90,10 +104,13 @@ export default function SearchModal({ onMangaAdded }: SearchModalProps) {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2.5 rounded-xl bg-pastel-primary text-white text-sm font-medium hover:bg-pastel-secondary transition-colors shadow-sm inline-flex items-center gap-2 cursor-pointer"
+        className="px-4 py-2.5 rounded-xl bg-pastel-primary text-white text-xs sm:text-sm font-semibold hover:bg-pastel-secondary transition-all shadow-sm shadow-pastel-primary/20 inline-flex items-center gap-2 cursor-pointer active:scale-95"
       >
-        <Plus size={18} weight="bold" />
-        <span>Cari & Tambah Manga</span>
+        <Plus size={16} weight="bold" />
+        <span>Tambah Manga</span>
+        <kbd className="hidden sm:inline-block ml-1 px-1.5 py-0.5 text-[10px] bg-white/20 rounded-md font-mono text-white/90">
+          ⌘K
+        </kbd>
       </button>
 
       {isOpen && (

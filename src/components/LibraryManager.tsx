@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import {
   Trash,
   Plus,
+  Minus,
   SpinnerGap,
   MagnifyingGlass,
+  ArrowSquareOut,
+  Books,
+  BookOpen,
+  CheckCircle,
+  Clock,
+  X,
 } from "@phosphor-icons/react";
 
 export interface UserMangaItem {
@@ -18,12 +25,35 @@ export interface UserMangaItem {
   updatedAt: string | Date;
 }
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  reading: { label: "Reading", color: "bg-pastel-primary text-white" },
-  completed: { label: "Completed", color: "bg-emerald-600 text-white" },
-  plan_to_read: { label: "Plan to Read", color: "bg-pastel-surface text-[#1e1b4b] border border-pastel-accent/40" },
-  on_hold: { label: "On Hold", color: "bg-amber-100 text-amber-800" },
-  dropped: { label: "Dropped", color: "bg-slate-200 text-slate-700" },
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; badgeClass: string; dotClass: string }
+> = {
+  reading: {
+    label: "Reading",
+    badgeClass: "bg-pastel-primary text-white shadow-xs",
+    dotClass: "bg-pastel-primary",
+  },
+  completed: {
+    label: "Completed",
+    badgeClass: "bg-emerald-600 text-white shadow-xs",
+    dotClass: "bg-emerald-600",
+  },
+  plan_to_read: {
+    label: "Plan to Read",
+    badgeClass: "bg-white/95 text-slate-800 border border-pastel-accent/50 shadow-xs",
+    dotClass: "bg-slate-400",
+  },
+  on_hold: {
+    label: "On Hold",
+    badgeClass: "bg-amber-100 text-amber-900 border border-amber-200 shadow-xs",
+    dotClass: "bg-amber-500",
+  },
+  dropped: {
+    label: "Dropped",
+    badgeClass: "bg-slate-100 text-slate-700 border border-slate-300 shadow-xs",
+    dotClass: "bg-slate-400",
+  },
 };
 
 const getCoverUrl = (url: string | null) => {
@@ -72,7 +102,9 @@ export default function LibraryManager() {
 
     // Optimistic UI update
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, currentChapter: newChapter } : item))
+      prev.map((item) =>
+        item.id === id ? { ...item, currentChapter: newChapter } : item
+      )
     );
 
     try {
@@ -82,10 +114,10 @@ export default function LibraryManager() {
         body: JSON.stringify({ id, currentChapter: newChapter }),
       });
       if (!res.ok) {
-        fetchLibrary(); // rollback
+        fetchLibrary();
       }
     } catch {
-      fetchLibrary(); // rollback
+      fetchLibrary();
     } finally {
       setUpdatingId(null);
     }
@@ -96,7 +128,9 @@ export default function LibraryManager() {
 
     // Optimistic UI update
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: newStatus as any } : item))
+      prev.map((item) =>
+        item.id === id ? { ...item, status: newStatus as any } : item
+      )
     );
 
     try {
@@ -106,17 +140,17 @@ export default function LibraryManager() {
         body: JSON.stringify({ id, status: newStatus }),
       });
       if (!res.ok) {
-        fetchLibrary(); // rollback
+        fetchLibrary();
       }
     } catch {
-      fetchLibrary(); // rollback
+      fetchLibrary();
     } finally {
       setUpdatingId(null);
     }
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Hapus "${title}" dari library Anda?`)) return;
+    if (!confirm(`Hapus "${title}" dari library?`)) return;
 
     setItems((prev) => prev.filter((item) => item.id !== id));
 
@@ -132,7 +166,9 @@ export default function LibraryManager() {
   // Filter items
   const filteredItems = items.filter((item) => {
     const matchesTab = activeTab === "all" || item.status === activeTab;
-    const matchesSearch = item.title.toLowerCase().includes(searchFilter.toLowerCase().trim());
+    const matchesSearch = item.title
+      .toLowerCase()
+      .includes(searchFilter.toLowerCase().trim());
     return matchesTab && matchesSearch;
   });
 
@@ -148,19 +184,56 @@ export default function LibraryManager() {
 
   if (loading) {
     return (
-      <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
+      <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-3">
         <SpinnerGap size={36} className="animate-spin text-pastel-primary" />
-        <span className="text-sm font-medium">Memuat library manga...</span>
+        <span className="text-xs font-medium text-slate-500">Memuat library...</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Search & Filter Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Quick Metrics Bar */}
+      {items.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white/75 backdrop-blur-xs p-3.5 rounded-2xl border border-pastel-accent/30 shadow-2xs">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <Books size={14} className="text-pastel-primary" weight="bold" />
+              <span>Total Manga</span>
+            </div>
+            <div className="text-xl font-extrabold text-[#1e1b4b] mt-1">{counts.all}</div>
+          </div>
+
+          <div className="bg-white/75 backdrop-blur-xs p-3.5 rounded-2xl border border-pastel-accent/30 shadow-2xs">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <BookOpen size={14} className="text-pastel-primary" weight="bold" />
+              <span>Sedang Dibaca</span>
+            </div>
+            <div className="text-xl font-extrabold text-pastel-primary mt-1">{counts.reading}</div>
+          </div>
+
+          <div className="bg-white/75 backdrop-blur-xs p-3.5 rounded-2xl border border-pastel-accent/30 shadow-2xs">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <CheckCircle size={14} className="text-emerald-600" weight="bold" />
+              <span>Selesai</span>
+            </div>
+            <div className="text-xl font-extrabold text-emerald-600 mt-1">{counts.completed}</div>
+          </div>
+
+          <div className="bg-white/75 backdrop-blur-xs p-3.5 rounded-2xl border border-pastel-accent/30 shadow-2xs">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <Clock size={14} className="text-slate-500" weight="bold" />
+              <span>Rencana Baca</span>
+            </div>
+            <div className="text-xl font-extrabold text-[#1e1b4b] mt-1">{counts.plan_to_read}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Filter Tabs & In-Library Search */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1">
         {/* Status Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="bg-white/80 p-1 rounded-2xl border border-pastel-accent/30 shadow-xs flex items-center gap-1 overflow-x-auto scrollbar-none">
           {[
             { key: "all", label: "Semua", count: counts.all },
             { key: "reading", label: "Reading", count: counts.reading },
@@ -175,16 +248,18 @@ export default function LibraryManager() {
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                   isActive
-                    ? "bg-pastel-primary text-white shadow-sm"
-                    : "bg-white/80 text-slate-700 hover:bg-white border border-pastel-accent/30"
+                    ? "bg-pastel-primary text-white shadow-xs"
+                    : "text-slate-600 hover:text-[#1e1b4b] hover:bg-pastel-surface/30"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isActive ? "bg-white/25 text-white" : "bg-pastel-surface/60 text-slate-600"
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isActive
+                      ? "bg-white/25 text-white"
+                      : "bg-pastel-surface/60 text-slate-600"
                   }`}
                 >
                   {tab.count}
@@ -198,56 +273,66 @@ export default function LibraryManager() {
         {items.length > 0 && (
           <div className="relative w-full md:w-64">
             <MagnifyingGlass
-              size={16}
+              size={15}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              weight="bold"
             />
             <input
               type="text"
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              placeholder="Filter library saya..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs bg-white/80 border border-pastel-accent/40 rounded-xl focus:outline-none focus:border-pastel-primary focus:bg-white transition-all text-[#1e1b4b]"
+              placeholder="Cari judul di library..."
+              className="w-full pl-8.5 pr-8 py-2 text-xs bg-white/90 border border-pastel-accent/40 rounded-xl focus:outline-none focus:border-pastel-primary focus:bg-white transition-all text-[#1e1b4b] placeholder-slate-400 shadow-2xs"
             />
+            {searchFilter && (
+              <button
+                type="button"
+                onClick={() => setSearchFilter("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X size={13} weight="bold" />
+              </button>
+            )}
           </div>
         )}
       </div>
 
       {/* Manga Grid */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white/60 border border-pastel-accent/30 rounded-2xl p-12 text-center max-w-md mx-auto my-6">
-          <div className="w-16 h-16 rounded-2xl bg-pastel-surface/60 flex items-center justify-center text-2xl mx-auto mb-4 text-pastel-primary">
-            📚
+        <div className="bg-white/80 border border-pastel-accent/30 rounded-3xl p-12 text-center max-w-md mx-auto my-8 shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-pastel-surface/50 flex items-center justify-center text-pastel-primary mx-auto mb-4">
+            <Books size={28} weight="duotone" />
           </div>
           <h3 className="text-base font-bold text-[#1e1b4b]">
             {items.length === 0
-              ? "Belum ada manga di library Anda"
+              ? "Library masih kosong"
               : "Tidak ada manga di filter ini"}
           </h3>
-          <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+          <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
             {items.length === 0
               ? "Klik tombol '+ Cari & Tambah Manga' di pojok kanan atas untuk mulai menyimpan bacaan."
-              : "Coba ganti tab status atau kata kunci filter pencarian di atas."}
+              : "Coba pilih tab status lain atau hapus filter pencarian."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-4 md:gap-5">
           {filteredItems.map((manga) => {
-            const statusConfig = STATUS_LABELS[manga.status] || STATUS_LABELS.reading;
+            const statusConfig = STATUS_CONFIG[manga.status] || STATUS_CONFIG.reading;
 
             return (
               <div
                 key={manga.id}
-                className="group bg-white rounded-2xl border border-pastel-accent/40 hover:border-pastel-accent hover:shadow-md transition-all overflow-hidden flex flex-col"
+                className="group bg-white rounded-2xl border border-pastel-accent/35 hover:border-pastel-accent hover:shadow-lg hover:shadow-pastel-primary/10 transition-all duration-200 overflow-hidden flex flex-col"
               >
-                {/* Cover Image */}
-                <div className="relative aspect-[2/3] bg-pastel-surface/30 overflow-hidden">
+                {/* Poster Cover */}
+                <div className="relative aspect-[2/3] bg-pastel-surface/20 overflow-hidden">
                   {manga.coverUrl ? (
                     <img
                       src={getCoverUrl(manga.coverUrl) || ""}
                       alt={manga.title}
                       loading="lazy"
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
@@ -255,73 +340,102 @@ export default function LibraryManager() {
                     </div>
                   )}
 
-                  {/* Subtle top vignette for badge clarity */}
-                  <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-black/25 to-transparent pointer-events-none" />
+                  {/* Gradient vignette for badge and button contrast */}
+                  <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black/50 via-black/15 to-transparent pointer-events-none" />
 
-                  {/* Status Badge floating */}
-                  <div className="absolute top-2 left-2">
+                  {/* Status Badge */}
+                  <div className="absolute top-2 left-2 z-10">
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm backdrop-blur-sm ${statusConfig.color}`}
+                      className={`text-[9.5px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full ${statusConfig.badgeClass}`}
                     >
                       {statusConfig.label}
                     </span>
                   </div>
 
-                  {/* Delete Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(manga.id, manga.title)}
-                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-white/90 text-rose-500 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-50 shadow-sm cursor-pointer"
-                    title="Hapus dari library"
-                  >
-                    <Trash size={14} weight="bold" />
-                  </button>
+                  {/* Action Buttons Top-Right */}
+                  <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                    {/* Read on MangaDex link */}
+                    <a
+                      href={`https://mangadex.org/title/${manga.mangaId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg bg-white/90 text-slate-700 hover:text-pastel-primary hover:bg-white shadow-xs transition-colors cursor-pointer"
+                      title="Buka di MangaDex"
+                    >
+                      <ArrowSquareOut size={13} weight="bold" />
+                    </a>
+
+                    {/* Delete button */}
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(manga.id, manga.title)}
+                      className="p-1.5 rounded-lg bg-white/90 text-rose-500 hover:bg-rose-50 shadow-xs transition-colors cursor-pointer"
+                      title="Hapus dari library"
+                    >
+                      <Trash size={13} weight="bold" />
+                    </button>
+                  </div>
                 </div>
 
-                {/* Card Content */}
-                <div className="p-3 flex-1 flex flex-col justify-between space-y-3">
+                {/* Card Info & Controls */}
+                <div className="p-3 flex-1 flex flex-col justify-between space-y-3 bg-white">
                   <div>
                     <h3
-                      className="font-bold text-xs sm:text-sm text-[#1e1b4b] line-clamp-2 leading-snug"
+                      className="font-bold text-xs sm:text-[13px] text-[#1e1b4b] line-clamp-2 leading-snug group-hover:text-pastel-primary transition-colors"
                       title={manga.title}
                     >
                       {manga.title}
                     </h3>
                   </div>
 
-                  <div className="space-y-2 pt-1 border-t border-pastel-surface/40">
-                    {/* Chapter Progress Controls */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <span className="text-[11px] text-slate-500">Ch.</span>
+                  <div className="space-y-2 pt-2 border-t border-pastel-surface/40">
+                    {/* Stepper Chapter Controls */}
+                    <div className="flex items-center gap-1.5">
+                      {/* Decrement Button */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleUpdateChapter(manga.id, Math.max(0, manga.currentChapter - 1))
+                        }
+                        disabled={manga.currentChapter <= 0}
+                        className="w-7 h-7 rounded-lg bg-pastel-canvas text-slate-600 hover:bg-pastel-surface hover:text-[#1e1b4b] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center transition-colors cursor-pointer shrink-0 border border-pastel-accent/30"
+                        title="Kurangi 1 chapter"
+                      >
+                        <Minus size={12} weight="bold" />
+                      </button>
+
+                      {/* Chapter Value Display & Input */}
+                      <div className="flex-1 flex items-center justify-center bg-pastel-canvas/60 border border-pastel-accent/40 rounded-lg px-1.5 py-1 text-center">
+                        <span className="text-[10px] text-slate-500 mr-1 font-medium">Ch.</span>
                         <input
                           type="number"
                           value={manga.currentChapter}
                           onChange={(e) =>
                             handleUpdateChapter(manga.id, parseFloat(e.target.value) || 0)
                           }
-                          className="w-14 text-xs font-bold text-pastel-primary bg-pastel-canvas/60 border border-pastel-accent/40 rounded-lg px-1.5 py-0.5 text-center focus:outline-none focus:border-pastel-primary"
+                          className="w-12 text-center text-xs font-bold text-pastel-primary bg-transparent focus:outline-none"
                         />
                       </div>
 
-                      {/* Quick +1 Chapter Button */}
+                      {/* Increment Button (+1) */}
                       <button
                         type="button"
-                        onClick={() => handleUpdateChapter(manga.id, manga.currentChapter + 1)}
-                        className="px-2.5 py-1 text-xs font-bold rounded-lg bg-pastel-primary text-white hover:bg-pastel-secondary active:scale-95 transition-all shadow-xs cursor-pointer flex items-center gap-0.5"
+                        onClick={() =>
+                          handleUpdateChapter(manga.id, manga.currentChapter + 1)
+                        }
+                        className="w-7 h-7 rounded-lg bg-pastel-primary text-white hover:bg-pastel-secondary active:scale-90 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-2xs font-bold"
                         title="Tambah 1 chapter"
                       >
                         <Plus size={12} weight="bold" />
-                        <span>1</span>
                       </button>
                     </div>
 
-                    {/* Status Dropdown Selector */}
+                    {/* Status Dropdown */}
                     <div>
                       <select
                         value={manga.status}
                         onChange={(e) => handleUpdateStatus(manga.id, e.target.value)}
-                        className="w-full text-[11px] font-medium bg-pastel-surface/30 border border-pastel-accent/30 rounded-lg py-1 px-1.5 text-slate-700 focus:outline-none cursor-pointer"
+                        className="w-full text-[11px] font-medium bg-pastel-canvas/40 hover:bg-pastel-surface/30 border border-pastel-accent/40 rounded-lg py-1 px-2 text-slate-800 focus:outline-none focus:border-pastel-primary cursor-pointer transition-colors"
                       >
                         <option value="reading">Reading</option>
                         <option value="completed">Completed</option>
