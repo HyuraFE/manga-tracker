@@ -6,7 +6,7 @@
   </a>
 
   <p align="center">
-    A clean, minimalist personal tracker to manage your manga reading progress.
+    Aplikasi pencatat progres bacaan manga pribadi yang bersih dan minimalis.
   </p>
 
   <!-- Badges dengan palet warna Soft Blue (#7aa2f7, #89b4fa, #a9b1d6) -->
@@ -23,28 +23,28 @@
   </p>
 
   <p align="center">
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#-fitur">Fitur</a> •
+    <a href="#️tech-stack">Tech Stack</a>
   </p>
 
 </div>
 
 <br />
 
-<!-- Opsional: Ganti URL gambar di bawah dengan screenshot aplikasimu -->
+<!-- Preview Aplikasi -->
 <div align="center">
   <img src="https://github.com/HyuraFE/manga-tracker/blob/main/assets/library.png" alt="Preview" width="85%" style="border-radius: 8px;" />
 </div>
 
 <br />
 
-## ✨ Features
+## ✨ Fitur
 
-- **Reading Progress** — Log current chapters, volumes, and reading status (`Reading`, `Completed`, `Plan to Read`, `On Hold`).
-- **Edge Database** — Fast, low-latency SQLite storage powered by Turso (libSQL).
-- **Secure Authentication** — Seamless user management and session handling powered by Clerk.
-- **Quick Search & Filter** — Instantly sort your library by title, genre, or score.
-- **Minimalist Interface** — Distraction-free UI with a calm, soft-blue aesthetic.
+- **Pencatatan Progres Baca** — Catat chapter dan volume saat ini, serta atur status bacaan (`Sedang Dibaca`, `Selesai`, `Rencana Baca`, `Ditunda`).
+- **Database Edge** — Penyimpanan SQLite berkecepatan tinggi dengan latensi rendah yang ditenagai oleh Turso (libSQL).
+- **Autentikasi Aman** — Manajemen pengguna dan sesi login yang praktis menggunakan Clerk.
+- **Pencarian & Filter Cepat** — Urutkan dan cari koleksi manga secara instan berdasarkan judul, genre, atau skor.
+- **Antarmuka Minimalis** — Tampilan bebas distraksi dengan estetika warna *soft-blue* yang nyaman di mata.
 
 ## 🛠️ Tech Stack
 
@@ -54,4 +54,3 @@
   <img src="https://img.shields.io/badge/Turso-1a1b26?style=flat-square&logo=turso&logoColor=7dcfff" alt="Turso" />
   <img src="https://img.shields.io/badge/Clerk-1a1b26?style=flat-square&logo=clerk&logoColor=a9b1d6" alt="Clerk" />
 </p>
-
