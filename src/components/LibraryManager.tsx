@@ -56,6 +56,14 @@ const STATUS_CONFIG: Record<
   },
 };
 
+const getCoverUrl = (url: string | null | undefined) => {
+  if (!url) return null;
+  if (url.startsWith("https://uploads.mangadex.org/")) {
+    return `/api/manga/cover?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+};
+
 export default function LibraryManager() {
   const [items, setItems] = useState<UserMangaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -320,10 +328,9 @@ export default function LibraryManager() {
                 <div className="relative aspect-[2/3] bg-pastel-surface/20 overflow-hidden">
                   {manga.coverUrl ? (
                     <img
-                      src={manga.coverUrl}
+                      src={getCoverUrl(manga.coverUrl) || ""}
                       alt={manga.title}
                       loading="lazy"
-                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
                     />
                   ) : (

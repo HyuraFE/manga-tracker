@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { fetchMangaDex } from "../../../lib/mangadex";
 
 const FALLBACK_POPULAR = [
   {
@@ -66,13 +67,9 @@ export const GET: APIRoute = async () => {
     mangaDexUrl.searchParams.append("contentRating[]", "safe");
     mangaDexUrl.searchParams.append("contentRating[]", "suggestive");
 
-    const res = await fetch(mangaDexUrl.toString(), {
-      headers: {
-        "User-Agent": "MangaTrack/1.0",
-      },
-    });
+    const res = await fetchMangaDex(mangaDexUrl.toString());
 
-    if (!res.ok) {
+    if (res.status >= 400 || res.buffer.length === 0) {
       return new Response(JSON.stringify({ data: FALLBACK_POPULAR }), {
         status: 200,
         headers: {
@@ -82,7 +79,7 @@ export const GET: APIRoute = async () => {
       });
     }
 
-    const data = await res.json();
+    const data = JSON.parse(res.buffer.toString("utf8"));
 
     const results = (data.data || []).map((item: any) => {
       const titles = item.attributes?.title || {};
@@ -119,7 +116,6 @@ export const GET: APIRoute = async () => {
       }
     );
   } catch {
-    // Fallback jika API MangaDex sedang offline atau terhalang koneksi lokal
     return new Response(JSON.stringify({ data: FALLBACK_POPULAR }), {
       status: 200,
       headers: {

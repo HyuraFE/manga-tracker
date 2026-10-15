@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { fetchMangaDex } from "../../../lib/mangadex";
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
@@ -20,20 +21,16 @@ export const GET: APIRoute = async ({ request }) => {
     mangaDexUrl.searchParams.append("contentRating[]", "safe");
     mangaDexUrl.searchParams.append("contentRating[]", "suggestive");
 
-    const res = await fetch(mangaDexUrl.toString(), {
-      headers: {
-        "User-Agent": "MangaTrack/1.0",
-      },
-    });
+    const res = await fetchMangaDex(mangaDexUrl.toString());
 
-    if (!res.ok) {
+    if (res.status >= 400 || res.buffer.length === 0) {
       return new Response(
         JSON.stringify({ error: "Gagal mengambil data dari MangaDex" }),
         { status: 502, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const data = await res.json();
+    const data = JSON.parse(res.buffer.toString("utf8"));
 
     const results = (data.data || []).map((item: any) => {
       const titles = item.attributes?.title || {};
