@@ -24,7 +24,7 @@
 
   <p align="center">
     <a href="#-fitur">Fitur</a> •
-    <a href="#️tech-stack">Tech Stack</a>
+    <a href="#️-tech-stack">Tech Stack</a>
   </p>
 
 </div>
