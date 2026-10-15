@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pastel-primary: #5465ff;
+  --color-pastel-secondary: #788bff;
+  --color-pastel-accent: #9bb1ff;
+  --color-pastel-surface: #bfd7ff;
+  --color-pastel-canvas: #e2fdff;
+
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-pastel-canvas);
+  color: #1e1b4b;
+  min-height: 100dvh;
+  margin: 0;
+  font-family: var(--font-sans);
+}

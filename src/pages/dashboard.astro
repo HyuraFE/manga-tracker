@@ -1,0 +1,55 @@
+---
+import { UserButton } from "@clerk/astro/components";
+import SearchModal from "../components/SearchModal";
+import LibraryManager from "../components/LibraryManager";
+import "../styles/global.css";
+
+const { userId } = Astro.locals.auth();
+
+if (!userId) {
+  return Astro.redirect("/sign-in");
+}
+---
+
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Library · MangaTrack</title>
+  </head>
+  <body class="bg-pastel-canvas text-[#1e1b4b] antialiased min-h-[100dvh]">
+    <!-- Navbar -->
+    <header class="w-full border-b border-pastel-accent/30 bg-white/70 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-pastel-primary flex items-center justify-center text-white font-bold text-sm shadow-sm">
+            M
+          </div>
+          <span class="font-bold text-lg tracking-tight">MangaTrack</span>
+        </a>
+
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-slate-500 hidden sm:inline">ID: {userId.slice(0, 10)}...</span>
+          <UserButton afterSignOutUrl="/" />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-pastel-accent/30 mb-6">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Library Saya</h1>
+          <p class="text-sm text-slate-600 mt-1">Kelola dan pantau progress bacaan manga Anda.</p>
+        </div>
+
+        <div>
+          <SearchModal client:load />
+        </div>
+      </div>
+
+      <!-- Library Grid & Manager -->
+      <LibraryManager client:load />
+    </main>
+  </body>
+</html>

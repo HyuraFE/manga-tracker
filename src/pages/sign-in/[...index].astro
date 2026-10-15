@@ -1,0 +1,23 @@
+---
+import { SignIn } from "@clerk/astro/components";
+import "../../styles/global.css";
+---
+
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Masuk · MangaTrack</title>
+  </head>
+  <body class="bg-pastel-canvas min-h-[100dvh] flex items-center justify-center p-4">
+    <div class="w-full max-w-md flex flex-col items-center">
+      <a href="/" class="mb-6 flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-pastel-primary flex items-center justify-center text-white font-bold text-base shadow-sm">
+          M
+        </div>
+        <span class="font-bold text-xl tracking-tight text-[#1e1b4b]">MangaTrack</span>
+      </a>
+      <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" forceRedirectUrl="/dashboard" />
+    </div>
+  </body>
+</html>
